@@ -42,91 +42,177 @@ app.post('/interactions', async function (req, res) {
     const { name } = data;
 
     // "test" command
-    if (name === 'test') {
+    if (name === 'help') {
       // Send a message into the channel where command was triggered from
       return res.send({
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
         data: {
           // Fetches a random emoji to send from a helper function
-          content: 'hello world ' + getRandomEmoji(),
+          content: `
+This bot allows you to schedule netplay games, the following commands are available:
+/help
+/schedule <rom> <md5> <time>
+/list
+/join <id>
+/leave <id>
+/remove <id>
+/new-king <@userid>
+/next-player
+          `
         },
       });
     }
 
-    // "challenge" command
-    if (name === 'challenge' && id) {
+    // "schedule" command
+    if (name === 'schedule' && id) {
       const userId = req.body.member.user.id;
       // User's object choice
-      const objectName = req.body.data.options[0].value;
+      const rom = req.body.data.options[0].value;
+      const md5 = req.body.data.options[1].value;
+      const time = req.body.data.options[2].value;
 
       // Create active game using message ID as the game ID
       activeGames[id] = {
           id: userId,
-          objectName,
+          rom,
+          md5,
+          time,
+          players: [],
+          koh: userId
       };
 
       return res.send({
-      type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-      data: {
-          content: `Rock papers scissors challenge from <@${userId}>`,
-          components: [
-          {
-              type: MessageComponentTypes.ACTION_ROW,
-              components: [
-              {
-                  type: MessageComponentTypes.BUTTON,
-                  // Append the game ID to use later on
-                  custom_id: `accept_button_${req.body.id}`,
-                  label: 'Accept',
-                  style: ButtonStyleTypes.PRIMARY,
-              },
-              ],
-          },
-          ],
-      },
+        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+        data: {
+            content: `Scheduled netplay game. KoH is <@${userId}>.`,
+        },
       });
     }
+
+    // "list" command
+    if (name === 'list' && id) {
+
+      let output = "The following games are scheduled:\n";
+      let aux = '';
+      for(let gameid in activeGames) {
+        let game = activeGames[gameid];
+
+        aux += `Game ${gameid} : ` + game.rom + " (" + game.md5 + ") at " + game.time + "\n";
+      }
+
+      if(! aux) {
+        output = "There are no scheduled games yet";
+      }
+      else {
+        output += aux;
+      }
+
+      return res.send({
+        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+        data: {
+            content: output,
+        },
+      });
+    }
+
+    // "join" command
+    if (name === 'join' && id) {
+      const userId = req.body.member.user.id;
+      // User's object choice
+      const gameid = req.body.data.options[0].value;
+
+      // Adds the user to the game queue
+      activeGames[gameid].players.push(userId);
+
+      return res.send({
+        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+        data: {
+            content: `You have joined the game.`,
+        },
+      });
+    }
+
+    // "leave" command
+    if (name === 'leave' && id) {
+      const userId = req.body.member.user.id;
+      // User's object choice
+      const gameid = req.body.data.options[0].value;
+
+      // Removes the user from the game queue
+      activeGames[gameid].players = activeGames[gameid].players.filter((item) => item != userId);
+
+      return res.send({
+        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+        data: {
+            content: `You have joined the game.`,
+        },
+      });
+    }
+
+    // "remove" command
+    if (name === 'remove' && id) {
+      const userId = req.body.member.user.id;
+      // User's object choice
+      const gameid = req.body.data.options[0].value;
+
+      // Removes the game
+      activeGames = activeGames.filter((item) => item != gameid);
+
+      return res.send({
+        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+        data: {
+            content: `You have joined the game.`,
+        },
+      });
+    }
+
+    // "new-king" command
+    if (name === 'new-king' && id) {
+      const userId = req.body.member.user.id;
+
+      // User's object choice
+      const gameid = req.body.data.options[0].value;
+      const koh = req.body.data.options[1].value;
+
+      // Declares the new-king
+      activeGames[gameid].koh = koh;
+
+      return res.send({
+        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+        data: {
+            content: `The new KoH is <@{$koh}>.`,
+        },
+      });
+    }
+
+    // "next-player" command
+    if (name === 'next-player' && id) {
+      const userId = req.body.member.user.id;
+
+      // User's object choice
+      const gameid = req.body.data.options[0].value;
+
+      // Gets the next player to notify him
+      const nextPlayer = activeGames[gameid].players[0] || null;
+      let output = "There are no more player to play.";
+      if(nextPlayer) {
+        // Removes this player from the queue
+        activeGames[gameid].players = activeGames[gameid].players.filter((item) => item != nextPlayer);
+        // Notifies the next player
+        output = `The next player to play is <@{$nextPlayer}>.`;
+      }
+
+      return res.send({
+        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+        data: {
+            content: output
+        },
+      });
+    }
+
   }
 
-  if (type === InteractionType.MESSAGE_COMPONENT) {
-    // custom_id set in payload when sending message component
-    const componentId = data.custom_id;
 
-      if (componentId.startsWith('accept_button_')) {
-        // get the associated game ID
-        const gameId = componentId.replace('accept_button_', '');
-        // Delete message with token in request body
-        const endpoint = `webhooks/${process.env.APP_ID}/${req.body.token}/messages/${req.body.message.id}`;
-        try {
-          await res.send({
-            type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-            data: {
-              // Fetches a random emoji to send from a helper function
-              content: 'What is your object of choice?',
-              // Indicates it'll be an ephemeral message
-              flags: InteractionResponseFlags.EPHEMERAL,
-              components: [
-                {
-                  type: MessageComponentTypes.ACTION_ROW,
-                  components: [
-                    {
-                      type: MessageComponentTypes.STRING_SELECT,
-                      // Append game ID
-                      custom_id: `select_choice_${gameId}`,
-                      options: getShuffledOptions(),
-                    },
-                  ],
-                },
-              ],
-            },
-          });
-          // Delete previous message
-          await DiscordRequest(endpoint, { method: 'DELETE' });
-        } catch (err) {
-          console.error('Error sending message:', err);
-        }
-      }
-    }
 });
 
 app.listen(PORT, () => {

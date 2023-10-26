@@ -10,7 +10,7 @@
   "scripts": {
     "start": "node app.js",
     "register": "node commands.js",
-    "dev": "./node_modules/nodemon/bin/nodemon.js -L app.js"
+    "dev": "./node_modules/nodemon/bin/nodemon.js -L --inspect app.js"
   },
   "author": "Shay DeWael",
   "license": "MIT",
