@@ -36,10 +36,25 @@ const SCHEDULE_COMMAND = {
   type: 1, // CHAT-INPUT
 };
 
-// Command /list
-const LIST_COMMAND = {
-  name: 'list',
+// Command /list-games
+const LIST_GAMES_COMMAND = {
+  name: 'list-games',
   description: 'List scheduled games',
+  type: 1, // CHAT-INPUT, @see: https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-types
+};
+
+// Command /list-players
+const LIST_PLAYERS_COMMAND = {
+  name: 'list-players',
+  description: 'List games players',
+  options: [
+    {
+      type: 3, // STRING, @see: https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-type
+      name: 'id',
+      description: 'Game id',
+      required: true
+    },
+  ],
   type: 1, // CHAT-INPUT, @see: https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-types
 };
 
@@ -73,9 +88,9 @@ const LEAVE_COMMAND = {
   type: 1, // CHAT-INPUT
 };
 
-// Command /remove
+// Command /remove-game
 const REMOVE_COMMAND = {
-  name: 'remove',
+  name: 'remove-game',
   description: 'Removes an scheduled game',
   options: [
     {
@@ -100,7 +115,7 @@ const NEW_KING_COMMAND = {
       required: true
     },
     {
-      type: 3, // STRING, @see: https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-type
+      type: 6, // USER, @see: https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-type
       name: 'koh',
       description: 'KoH userId',
       required: true
@@ -127,7 +142,8 @@ const NEXT_PLAYER_COMMAND = {
 const ALL_COMMANDS = [
   HELP_COMMAND,
   SCHEDULE_COMMAND,
-  LIST_COMMAND,
+  LIST_GAMES_COMMAND,
+  LIST_PLAYERS_COMMAND,
   JOIN_COMMAND,
   LEAVE_COMMAND,
   REMOVE_COMMAND,

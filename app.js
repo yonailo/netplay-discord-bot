@@ -52,10 +52,11 @@ app.post('/interactions', async function (req, res) {
 This bot allows you to schedule netplay games, the following commands are available:
 /help
 /schedule <rom> <md5> <time>
-/list
+/list-games
+/list-players
 /join <id>
 /leave <id>
-/remove <id>
+/remove-game <id>
 /new-king <@userid>
 /next-player
           `
@@ -66,7 +67,6 @@ This bot allows you to schedule netplay games, the following commands are availa
     // "schedule" command
     if (name === 'schedule' && id) {
       const userId = req.body.member.user.id;
-      // User's object choice
       const rom = req.body.data.options[0].value;
       const md5 = req.body.data.options[1].value;
       const time = req.body.data.options[2].value;
@@ -77,20 +77,20 @@ This bot allows you to schedule netplay games, the following commands are availa
           rom,
           md5,
           time,
-          players: [],
+          players: [userId],
           koh: userId
       };
 
       return res.send({
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
         data: {
-            content: `Scheduled netplay game. KoH is <@${userId}>.`,
+            content: `Scheduled netplay game. The GameID is "${id}", the KoH is <@${userId}>.`,
         },
       });
     }
 
-    // "list" command
-    if (name === 'list' && id) {
+    // "list-games" command
+    if (name === 'list-games' && id) {
 
       let output = "The following games are scheduled:\n";
       let aux = '';
@@ -115,19 +115,39 @@ This bot allows you to schedule netplay games, the following commands are availa
       });
     }
 
-    // "join" command
-    if (name === 'join' && id) {
-      const userId = req.body.member.user.id;
-      // User's object choice
+    // "list-players" command
+    if (name === 'list-players' && id) {
       const gameid = req.body.data.options[0].value;
 
-      // Adds the user to the game queue
-      activeGames[gameid].players.push(userId);
+      let output = "The following players are in the queue:\n";
+
+      let playerNames = activeGames[gameid].players.map((player) => `<@${player}>`);
+      output += playerNames.join("\n");
 
       return res.send({
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
         data: {
-            content: `You have joined the game.`,
+            content: output,
+        },
+      });
+    }
+
+    // "join" command
+    if (name === 'join' && id) {
+      const userId = req.body.member.user.id;
+      const gameid = req.body.data.options[0].value;
+
+      // Adds the user to the game queue
+      let output = 'You have already joined this game.';
+      if(! activeGames[gameid].players.includes(userId)) {
+        activeGames[gameid].players.push(userId);
+        let output = "You have joined the game. List of players:\n";
+      }
+
+      return res.send({
+        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+        data: {
+            content: output,
         },
       });
     }
@@ -135,33 +155,35 @@ This bot allows you to schedule netplay games, the following commands are availa
     // "leave" command
     if (name === 'leave' && id) {
       const userId = req.body.member.user.id;
-      // User's object choice
       const gameid = req.body.data.options[0].value;
 
       // Removes the user from the game queue
       activeGames[gameid].players = activeGames[gameid].players.filter((item) => item != userId);
+      if(! activeGames[gameid].players.length) {
+        delete activeGames[gameid];
+      }
 
       return res.send({
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
         data: {
-            content: `You have joined the game.`,
+            content: `You have leaved the game.`,
         },
       });
     }
 
-    // "remove" command
-    if (name === 'remove' && id) {
+    // "remove-game" command
+    if (name === 'remove-game' && id) {
       const userId = req.body.member.user.id;
       // User's object choice
       const gameid = req.body.data.options[0].value;
 
       // Removes the game
-      activeGames = activeGames.filter((item) => item != gameid);
+      delete activeGames[gameid];
 
       return res.send({
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
         data: {
-            content: `You have joined the game.`,
+            content: `You have removed the game.`,
         },
       });
     }
@@ -169,8 +191,6 @@ This bot allows you to schedule netplay games, the following commands are availa
     // "new-king" command
     if (name === 'new-king' && id) {
       const userId = req.body.member.user.id;
-
-      // User's object choice
       const gameid = req.body.data.options[0].value;
       const koh = req.body.data.options[1].value;
 
@@ -180,7 +200,7 @@ This bot allows you to schedule netplay games, the following commands are availa
       return res.send({
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
         data: {
-            content: `The new KoH is <@{$koh}>.`,
+            content: `The new KoH is <@${koh}>.`,
         },
       });
     }
@@ -188,18 +208,19 @@ This bot allows you to schedule netplay games, the following commands are availa
     // "next-player" command
     if (name === 'next-player' && id) {
       const userId = req.body.member.user.id;
-
-      // User's object choice
       const gameid = req.body.data.options[0].value;
 
       // Gets the next player to notify him
       const nextPlayer = activeGames[gameid].players[0] || null;
-      let output = "There are no more player to play.";
+      let output = "There are no more players to play against.";
       if(nextPlayer) {
         // Removes this player from the queue
         activeGames[gameid].players = activeGames[gameid].players.filter((item) => item != nextPlayer);
         // Notifies the next player
-        output = `The next player to play is <@{$nextPlayer}>.`;
+        output = `The next player to play is <@${nextPlayer}>.`;
+      }
+      else {
+        delete activeGames[gameid];
       }
 
       return res.send({
