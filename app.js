@@ -250,7 +250,7 @@ This bot allows you to schedule netplay games, the following commands are availa
         output = "There are no scheduled games yet.";
       }
       else {
-        aux += "Use /np-join <gameid> to join the game queue.";
+        aux += "\nUse /np-join <gameid> to join the game queue.";
         output += aux;
       }
 

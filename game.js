@@ -13,7 +13,7 @@ export const GameManager = (function () {
         rom,
         md5,
         time,
-        players: [userId],
+        players: [],
         koh: userId
       }
 
