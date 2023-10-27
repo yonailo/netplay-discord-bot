@@ -45,6 +45,7 @@ export const GameManager = (function () {
           rom: aux.rom,
           md5: aux.md5,
           time: aux.time,
+          koh: aux.koh
         }
 
         games.push(game);
