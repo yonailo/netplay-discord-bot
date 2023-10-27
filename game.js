@@ -77,9 +77,6 @@ export const GameManager = (function () {
     removePlayer: function(gameid, userId) {
       if(activeGames[gameid]) {
         activeGames[gameid].players = activeGames[gameid].players.filter((item) => item != userId);
-        if(! activeGames[gameid].players.length) {
-          delete activeGames[gameid];
-        }
       }
     },
 
