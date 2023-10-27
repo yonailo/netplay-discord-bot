@@ -1,7 +1,3 @@
-import { use } from 'express/lib/application.js';
-import { capitalize } from './utils.js';
-
-
 
 // this is our GameManager object
 export const GameManager = (function () {
