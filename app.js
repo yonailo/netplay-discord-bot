@@ -3,22 +3,19 @@ import express from 'express';
 import {
   InteractionType,
   InteractionResponseType,
-  InteractionResponseFlags,
-  MessageComponentTypes,
-  ButtonStyleTypes,
+  InteractionResponseFlags
 } from 'discord-interactions';
-import { VerifyDiscordRequest, getRandomEmoji, DiscordRequest } from './utils.js';
+import { VerifyDiscordRequest } from './utils.js';
 import { GameManager } from './game.js';
 
 // Create an express app
 const app = express();
+
 // Get port, or default to 3000
 const PORT = process.env.PORT || 3000;
+
 // Parse request body and verifies incoming requests using discord-interactions package
 app.use(express.json({ verify: VerifyDiscordRequest(process.env.PUBLIC_KEY) }));
-
-// Store for in-progress games. In production, you'd want to use a DB
-const activeGames = {};
 
 /**
  * Interactions endpoint URL where Discord will send HTTP requests
@@ -50,8 +47,9 @@ app.post('/interactions', async function (req, res) {
           flags: InteractionResponseFlags.EPHEMERAL,
           content: `
 This bot allows you to schedule netplay games, the following commands are available:
+
 /np-help
-/np-schedule <rom> <md5> <time>
+/np-schedule <rom-name-plateform> <md5> <time>
 /np-list-players <gameid>
 /np-join <gameid>
 /np-leave <gameid>
@@ -59,6 +57,14 @@ This bot allows you to schedule netplay games, the following commands are availa
 /np-new-king <@userid>
 /np-next-player <gameid>
 /np-reminder
+
+This bot fits best with two players games where there is one winner and one looser. The winner is
+elected as the King of the Hill (KOH) and it can be challenged by other users in the game queue.
+The current KOH issues /np-next-player to play against waiting users. If the KOH looses, he must issue
+a /np-new-king to pass the crown to the winner, and the winner continues playing until the queue is empty.
+
+When the queue is empty, the curren KOH will be chosen as the winner of the competition,
+and he will remain KOH.
           `
         },
       });
@@ -123,7 +129,7 @@ This bot allows you to schedule netplay games, the following commands are availa
         }
       }
       else {
-        output = "You have already joined this game";
+        output = "You have already joined this game.";
       }
 
       return res.send({

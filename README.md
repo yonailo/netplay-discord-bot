@@ -1,6 +1,19 @@
 # Netplay discord bot
 
-This is a scheduler for King of the Hill (KoH) netplay games.
+This is a scheduler for King of the Hill (KoH) netplay games. The idea is to let people schedule its games, in the meantime other people subscribe to the game. At the specified time, the game's creator uses /np-next-player to pop up the next player of the queue. If he wins, he remains as the King of the Hill (KOH) and he can issue again the /np-next-player command to be challenged by the next user, until the queue is empty.
+
+Only the current KOH can issue the command /np-next-player. If the KOH looses, he must issue a /np-new-king to give the KOH crown to the other player, and the other
+player continues challenging until nobody else is on the queue.
+
+When the queue is empty, the curren KOH will be chosen as the winner of the competition, and he will remain KOH.
+
+This bot fits best with two players games where there must be one winner and one loser, like it football ones.
+
+There are other commands to leave / join games, etc, that can be discovered with /np-help.
+
+Feel free to modify this bot.
+
+Juan Rodriguez 27/10/2023 (juan.fco.rodriguez@gmail.com)
 
 ## Running app locally
 
