@@ -46,7 +46,7 @@ export const GameManager = (function () {
           gameid: gameid,
           rom: aux.rom,
           md5: aux.md5,
-          time: aux.time
+          time: aux.time,
         }
 
         games.push(game);
@@ -66,8 +66,13 @@ export const GameManager = (function () {
 
     addPlayer: function(gameid, userId) {
       if(activeGames[gameid]) {
-        activeGames[gameid].players.push(userId);
+        if(! activeGames[gameid].players.includes(userId)) {
+          activeGames[gameid].players.push(userId);
+          return true;
+        }
       }
+
+      return false;
     },
 
     removePlayer: function(gameid, userId) {
@@ -79,9 +84,12 @@ export const GameManager = (function () {
       }
     },
 
-    setKOH: function(gameid, userId) {
+    setKOH: function(gameid, userId, new_koh) {
       if(activeGames[gameid]) {
-        activeGames[gameid].koh = koh;
+        // Only the current KOH can elect a new KOH
+        if(activeGames[gameid].koh == userId) {
+          activeGames[gameid].koh = new_koh;
+        }
       }
     },
 

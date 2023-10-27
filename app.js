@@ -78,7 +78,7 @@ This bot allows you to schedule netplay games, the following commands are availa
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
         data: {
           flags: InteractionResponseFlags.EPHEMERAL,
-          content: `Scheduled netplay game. The GameID is "${gameid}", the KoH is <@${userId}>.`,
+          content: `Scheduled netplay game. The GameID is <${gameid}>, the KoH is <@${userId}>.`,
         },
       });
     }
@@ -112,10 +112,17 @@ This bot allows you to schedule netplay games, the following commands are availa
       const gameid = req.body.data.options[0].value;
 
       // Adds the user to the game queue
-      let output = 'You have already joined this game.';
-      if(! activeGames[gameid].players.includes(userId)) {
-        GameManager.addPlayer(gameid, userId);
-        let output = "You have joined the game. List of players:\n";
+      let output = "You have joined the game. List of players:\n";
+      let ok = GameManager.addPlayer(gameid, userId);
+      if(ok) {
+        let playerNames = GameManager.getPlayers(gameid);
+        if(playerNames.length) {
+            playerNames = playerNames.map((p) => "\t\t" + p);
+            output += playerNames.join("\n");
+        }
+      }
+      else {
+        output = "You have already joined this game";
       }
 
       return res.send({
@@ -172,13 +179,13 @@ This bot allows you to schedule netplay games, the following commands are availa
       const gameid = req.body.data.options[0].value;
       const koh = req.body.data.options[1].value;
 
-      // Declares the new-king
-      GameManager.setKOH(gameid, koh);
+      // The current king declares the new-king
+      GameManager.setKOH(gameid, userId, koh);
 
       return res.send({
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
         data: {
-            content: `The new KoH is <@${koh}>.`,
+            content: `The new KoH for Game <${gameid}> is <@${koh}>.`,
         },
       });
     }
@@ -212,14 +219,20 @@ This bot allows you to schedule netplay games, the following commands are availa
 
       let games = GameManager.getGames();
       games.forEach((game) => {
-        aux += `Game <${game.gameid}> : ` + game.rom + " (" + game.md5 + ") at " + game.time + "\n";
+        aux += `Game <${game.gameid}> : ` + game.rom + " (" + game.md5 + ") starts at " + game.time + "\n";
+        let playerNames = GameManager.getPlayers(game.gameid);
+        if(playerNames.length) {
+          playerNames = playerNames.map((p) => "\t\t" + p);
+          aux += playerNames.join("\n");
+          aux += "\n\n";
+        }
       });
 
       if(! aux) {
         output = "There are no scheduled games yet.";
       }
       else {
-        aux += "\nUse /np-join <gameid> to join !!.";
+        aux += "Use /np-join <gameid> to join the game queue.";
         output += aux;
       }
 

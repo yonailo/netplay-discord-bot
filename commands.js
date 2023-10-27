@@ -46,7 +46,7 @@ const LIST_PLAYERS_COMMAND = {
   options: [
     {
       type: 3, // STRING,
-      name: 'id',
+      name: 'gameid',
       description: 'Game id',
       required: true
     },
@@ -61,7 +61,7 @@ const JOIN_COMMAND = {
   options: [
     {
       type: 3, // STRING,
-      name: 'id',
+      name: 'gameid',
       description: 'Game id',
       required: true
     },
@@ -76,7 +76,7 @@ const LEAVE_COMMAND = {
   options: [
     {
       type: 3, // STRING,
-      name: 'id',
+      name: 'gameid',
       description: 'Game id',
       required: true
     },
@@ -91,7 +91,7 @@ const REMOVE_COMMAND = {
   options: [
     {
       type: 3, // STRING,
-      name: 'id',
+      name: 'gameid',
       description: 'Game id',
       required: true
     },
@@ -106,7 +106,7 @@ const NEW_KING_COMMAND = {
   options: [
     {
       type: 3, // STRING,
-      name: 'id',
+      name: 'gameid',
       description: 'Game id',
       required: true
     },
@@ -127,7 +127,7 @@ const NEXT_PLAYER_COMMAND = {
   options: [
     {
       type: 3, // STRING,
-      name: 'id',
+      name: 'gameid',
       description: 'Game id',
       required: true
     }
