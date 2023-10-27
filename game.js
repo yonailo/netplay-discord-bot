@@ -113,10 +113,6 @@ export const GameManager = (function () {
           activeGames[gameid].players = activeGames[gameid].players.filter((item) => item != nextPlayer);
         }
 
-        if(! activeGames[gameid].players.length) {
-          delete activeGames[gameid];
-        }
-
         return nextPlayer;
       }
       else {
