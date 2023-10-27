@@ -242,7 +242,7 @@ This bot allows you to schedule netplay games, the following commands are availa
         if(playerNames.length) {
           playerNames = playerNames.map((p) => "\t\t" + p);
           aux += playerNames.join("\n");
-          aux += "\n\n";
+          aux += "\n";
         }
       });
 
