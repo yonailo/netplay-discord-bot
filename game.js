@@ -1,3 +1,4 @@
+import { use } from 'express/lib/application.js';
 import { capitalize } from './utils.js';
 
 
@@ -27,6 +28,7 @@ export const GameManager = (function () {
       if(activeGames[gameid]) {
         let game = activeGames[gameid];
 
+        // Only the userId that has scheduled the game can delete it
         if(game.userId == userId) {
           delete activeGames[gameid];
           return true;
@@ -84,6 +86,15 @@ export const GameManager = (function () {
       }
     },
 
+    getKOH: function(gameid) {
+      if(activeGames[gameid]) {
+        return activeGames[gameid].koh;
+      }
+      else {
+        return null;
+      }
+    },
+
     setKOH: function(gameid, userId, new_koh) {
       if(activeGames[gameid]) {
         // Only the current KOH can elect a new KOH
@@ -93,23 +104,28 @@ export const GameManager = (function () {
       }
     },
 
-    getNextPlayer: function(gameid) {
+    getNextPlayer: function(gameid, userId) {
       if(! activeGames[gameid]) {
         return null;
       }
 
-      const nextPlayer = activeGames[gameid].players[0] || null;
-      if(nextPlayer) {
-        // Removes this player from the queue
-        activeGames[gameid].players = activeGames[gameid].players.filter((item) => item != nextPlayer);
+      // Only the current KOH can issue this command
+      if(activeGames[gameid].koh == userId) {
+        const nextPlayer = activeGames[gameid].players[0] || 0;
+        if(nextPlayer) {
+          // Removes this player from the queue
+          activeGames[gameid].players = activeGames[gameid].players.filter((item) => item != nextPlayer);
+        }
+
+        if(! activeGames[gameid].players.length) {
+          delete activeGames[gameid];
+        }
+
+        return nextPlayer;
       }
-
-      if(! activeGames[gameid].players.length) {
-        delete activeGames[gameid];
+      else {
+        return null;
       }
-
-      return nextPlayer;
-
     }
   }
 

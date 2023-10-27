@@ -91,6 +91,7 @@ This bot allows you to schedule netplay games, the following commands are availa
 
       let playerNames = GameManager.getPlayers(gameid);
       if(playerNames.length) {
+        playerNames = playerNames.map((p) => "\t\t" + p);
         output += playerNames.join("\n");
       }
       else {
@@ -145,7 +146,8 @@ This bot allows you to schedule netplay games, the following commands are availa
       return res.send({
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
         data: {
-            content: `You have leaved the game.`,
+          flags: InteractionResponseFlags.EPHEMERAL,
+          content: `You have leaved the game.`,
         },
       });
     }
@@ -195,13 +197,29 @@ This bot allows you to schedule netplay games, the following commands are availa
       const userId = req.body.member.user.id;
       const gameid = req.body.data.options[0].value;
 
-      // Gets the next player to notify him
-      let output = "There are no more players to play against.";
-      let nextPlayer = GameManager.getNextPlayer(gameid);
+      // Gets the next player to notify that it is his turn.
+      // Only the current KOH can issue this command.
+      let output = "";
+      let nextPlayer = GameManager.getNextPlayer(gameid, userId);
       if(nextPlayer) {
         // Notifies the next player
-        output = `The next player to play is <@${nextPlayer}>.`;
+        output = `The next player to play is <@${nextPlayer}>. Go ahead and good luck, maybe you will become the next King of the Hill !.`;
       }
+      else if(nextPlayer === null) {
+        // There is no gameid or you dont have permissions to issue this cmd.
+        let koh = GameManager.getKOH(gameid);
+        if(koh) {
+          output = `Only the current KOH <@${koh}> can issue this command.`;
+        }
+        else {
+          output = `The gameid <${gameid}> does not exist.`;
+        }
+      }
+      else if(nextPlayer === 0) {
+        // There are no more players in the queue.
+        output = "There are no more players to play against.";
+      }
+
 
       return res.send({
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
