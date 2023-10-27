@@ -237,7 +237,7 @@ This bot allows you to schedule netplay games, the following commands are availa
 
       let games = GameManager.getGames();
       games.forEach((game) => {
-        aux += `Game <${game.gameid}>, KOH <@{game.koh}> : ` + game.rom + " (" + game.md5 + ") starts at " + game.time + "\n";
+        aux += `Game <${game.gameid}>, KOH <@${game.koh}> : ` + game.rom + " (" + game.md5 + ") starts at " + game.time + "\n";
         let playerNames = GameManager.getPlayers(game.gameid);
         if(playerNames.length) {
           playerNames = playerNames.map((p) => "\t\t" + p);
