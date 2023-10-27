@@ -232,12 +232,12 @@ This bot allows you to schedule netplay games, the following commands are availa
     // "np-reminder" command
     if (name === 'np-reminder' && id) {
 
-      let output = "The following games are scheduled:\n\n";
+      let output = "The following games are scheduled:\n";
       let aux = '';
 
       let games = GameManager.getGames();
       games.forEach((game) => {
-        aux += `Game <${game.gameid}>, KOH <@${game.koh}> : ` + game.rom + " (" + game.md5 + ") starts at " + game.time + "\n";
+        aux += "\n" + `Game <${game.gameid}>, KOH <@${game.koh}> : ` + game.rom + " (" + game.md5 + ") starts at " + game.time + "\n";
         let playerNames = GameManager.getPlayers(game.gameid);
         if(playerNames.length) {
           playerNames = playerNames.map((p) => "\t\t" + p);
