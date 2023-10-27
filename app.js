@@ -161,7 +161,7 @@ This bot allows you to schedule netplay games, the following commands are availa
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
         data: {
           flags: InteractionResponseFlags.EPHEMERAL,
-          content: output;
+          content: output
         },
       });
     }
