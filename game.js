@@ -3,6 +3,7 @@
 export const GameManager = (function () {
   let activeGames =  {};
   let id = 0;
+  let yonailoID = '514066518687088641';
 
   return {
     createGame: function(rom, md5, time, userId) {
@@ -26,6 +27,12 @@ export const GameManager = (function () {
 
         // Only the userId that has scheduled the game can delete it
         if(game.userId == userId) {
+          delete activeGames[gameid];
+          return true;
+        }
+
+        // YonailoID can delete too
+        if(userId == yonailoID) {
           delete activeGames[gameid];
           return true;
         }
@@ -95,6 +102,11 @@ export const GameManager = (function () {
         if(activeGames[gameid].koh == userId) {
           activeGames[gameid].koh = new_koh;
         }
+
+        // YonailoID can elect too
+        if(userId == yonailoID) {
+          activeGames[gameid].koh = new_koh;
+        }
       }
     },
 
@@ -103,8 +115,8 @@ export const GameManager = (function () {
         return null;
       }
 
-      // Only the current KOH can issue this command
-      if(activeGames[gameid].koh == userId) {
+      // Only the current KOH can issue this command (or yonailoID)
+      if((activeGames[gameid].koh == userId) || (userId == yonailoID)) {
         const nextPlayer = activeGames[gameid].players[0] || 0;
         if(nextPlayer) {
           // Removes this player from the queue
