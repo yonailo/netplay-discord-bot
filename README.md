@@ -1,13 +1,12 @@
 # Netplay discord bot
 
-This is a scheduler for King of the Hill (KoH) netplay games. The idea is to let people schedule its games, in the meantime other people subscribe to the game. At the specified time, the game's creator uses /np-next-player to pop up the next player of the queue. If he wins, he remains as the King of the Hill (KOH) and he can issue again the /np-next-player command to be challenged by the next user, until the queue is empty.
+This is a scheduler for King of the Hill (KoH) netplay games. The idea is to let people schedule its games, in the meantime, other people subscribe to the game. At the specified start time, the game's creator uses /np-next-player to pop up the next player of the queue. If he wins, he remains as the King of the Hill (KOH) and he can issue again the /np-next-player command to be challenged by the next user, until the queue is empty.
 
-Only the current KOH can issue the command /np-next-player. If the KOH looses, he must issue a /np-new-king to give the KOH crown to the other player, and the other
-player continues challenging until nobody else is on the queue.
+Only the current KOH can issue the command /np-next-player. If the KOH loses, he must issue a /np-new-king to give the KOH crown to the winner, and the winner continues to be challenged until nobody else is in the queue.
 
-When the queue is empty, the curren KOH will be chosen as the winner of the competition, and he will remain KOH.
+When the queue is empty, the current KOH will be chosen as the winner of the competition, and he will remain KOH.
 
-This bot fits best with two players games where there must be one winner and one loser, like it football ones.
+This bot fits best with two players games where there must be one winner and one loser, like in football games.
 
 There are other commands to leave / join games, etc, that can be discovered with /np-help.
 
@@ -15,7 +14,7 @@ Feel free to modify this bot.
 
 Juan Rodriguez 27/10/2023 (juan.fco.rodriguez@gmail.com)
 
-## Running app locally
+## Running the app locally
 
 Before you start, you'll need to install [NodeJS](https://nodejs.org/en/download/) and [create a Discord app](https://discord.com/developers/applications) with the proper permissions:
 - `applications.commands`
@@ -24,7 +23,7 @@ Before you start, you'll need to install [NodeJS](https://nodejs.org/en/download
 
 Configuring the app is covered in detail in the [getting started guide](https://discord.com/developers/docs/getting-started).
 
-### Setup project
+### Setup the project
 
 First clone the project:
 ```
@@ -46,7 +45,7 @@ Fetching credentials is covered in detail in the [getting started guide](https:/
 
 ### Install slash commands
 
-The commands for the example app are set up in `commands.js`. All of the commands in the `ALL_COMMANDS` array at the bottom of `commands.js` will be installed when you run the `register` command configured in `package.json`:
+The commands are set up in `commands.js`. All of the commands in the `ALL_COMMANDS` array at the bottom of `commands.js` will be installed when you run the `register` command configured in `package.json`:
 
 ```
 npm run register
@@ -91,6 +90,7 @@ On the **General Information** tab, there will be an **Interactions Endpoint URL
 Click **Save Changes**, and your app should be ready to run 🚀
 
 ## Other resources
+
 - Read **[the documentation](https://discord.com/developers/docs/intro)** for in-depth information about API features.
 - Browse the `examples/` folder in this project for smaller, feature-specific code examples
 - Join the **[Discord Developers server](https://discord.gg/discord-developers)** to ask questions about the API, attend events hosted by the Discord API team, and interact with other devs.
